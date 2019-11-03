@@ -1,6 +1,27 @@
-#include<stdio.h>
+/* File:     Linear_Regs_Sequential.c
+ *
+ * Author:   Mehmet Cagri Aksoy - SW Engineer github.com/mcagriaksoy
+ * 
+ * License:  GNU General Public License v3.0
+ * 
+ * Purpose:  A program  try to predict Stock Prices in the next day (Sequentially No Process, No Threading is used).
+ * 
+ * Compile:
+ *    gcc -g -Wall -o Linear_Regs_Sequential Linear_Regs_Sequential.c
+ *    timer.h must be available
+ *
+ * Usage:
+ *    ./Linear_Regs_Sequential.c
+ *
+ * Input:    Number of lines should be covered to predict stock prices.
+ * Output:   A message from each process
+ *
+ */
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "timer.h"
+
 #define S 9900
 
 int main(int argc, char **argv)
@@ -8,11 +29,12 @@ int main(int argc, char **argv)
 int n;
 // Initializing the file pointer
 FILE *fs;
-fs = fopen("1.txt", "r");
+fs = fopen("1.csv", "r");
 char ch, buffer[9900];
 int i = 0, j = 0;
 float float_buffer[9900];
 float x[S], y[S], sumX=0, sumX2=0, sumY=0, sumXY=0, a, b;
+double start, finish;
 
 // Read the file unless the file encounters an EOF
 while(1){
@@ -61,13 +83,15 @@ while(1){
 	}
 }
 /* Input */
-printf("How many ?\n");
+printf("How many lines of Stock Price will be covered? (Higher numbers checks higher number of stocks Max:1530)\n");
 scanf("%d", &n);
 
 for(i=1;i<=n;i++)
 {
 y[i] = float_buffer[i];
 }
+
+GET_TIME(start);
 /* Calculating Required Sum */
 for(i=1;i<=n;i++)
 {
@@ -76,12 +100,15 @@ sumX2 = sumX2 + x[i]*x[i];
 sumY = sumY + y[i];
 sumXY = sumXY + x[i]*y[i];
 }
+ GET_TIME(finish);
 /* Calculating a and b */
 b = (n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);
 a = (sumY - b*sumX)/n;
 
+   printf("Thread 0 > Elapsed time = %e seconds\n", finish - start);
+
 /* Displaying value of a and b */
-printf("Values are: a=%0.2f and b = %0.2f",a,b);
+//printf("Values are: a=%0.2f and b = %0.2f",a,b);
 printf("\nEquation of best fit is: y = %0.2f + %0.2fx",a,b);
 float res = a + (b * (n+1));
 if(res < y[n] )
